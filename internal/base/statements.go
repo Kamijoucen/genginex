@@ -1,8 +1,9 @@
 package base
 
 import (
-	"github.com/kamijoucen/genginex/context"
 	"reflect"
+
+	"github.com/kamijoucen/genginex/context"
 )
 
 type Statements struct {

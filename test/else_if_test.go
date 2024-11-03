@@ -61,6 +61,8 @@ func Test_elseif(t *testing.T) {
 
 	start := time.Now().UnixNano()
 	// true: means when there are many rules， if one rule execute error，continue to execute rules after the occur error rule
+
+	// 遍历ast
 	err = eng.Execute(ruleBuilder, true)
 	end := time.Now().UnixNano()
 	if err != nil {
