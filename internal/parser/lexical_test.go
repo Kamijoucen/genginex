@@ -1,6 +1,28 @@
 package parser
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
+
+const rule_else_if_test = `
+'"lisicen"' '' test
+`
+
+// TestIfLexer
+func TestIfLexer(t *testing.T) {
+	lex := NewLexical(rule_else_if_test)
+
+	for {
+		token := lex.Next()
+		if token == nil {
+			break
+		}
+		fmt.Println(token)
+		t.Log(token)
+	}
+
+}
 
 // TestIsIdentifierFirstChar
 func TestIsIdentifierFirstChar(t *testing.T) {

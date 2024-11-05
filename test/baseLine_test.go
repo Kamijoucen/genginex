@@ -2,10 +2,11 @@ package test
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/kamijoucen/genginex/builder"
 	"github.com/kamijoucen/genginex/context"
 	"github.com/kamijoucen/genginex/engine"
-	"testing"
 )
 
 func Test_createBaseline(t *testing.T) {
