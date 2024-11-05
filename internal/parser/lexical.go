@@ -30,7 +30,8 @@ func (l *Lexical) Next() *Token {
 			token = l.scanIdentifier()
 			match = true
 		} else if IsDigitChar(curChar) {
-			// l.scanNumber()
+			token = l.scanNumber()
+			match = true
 		} else if curChar == '"' || curChar == '\'' {
 			l.curStrFlag = curChar
 			token = l.scanString()
@@ -45,30 +46,33 @@ func (l *Lexical) Next() *Token {
 	return token
 }
 
-func (l *Lexical) forward() {
-	if l.content[l.offset] == '\n' {
-		l.line++
-		l.column = 0
-	} else {
-		l.column++
-	}
-	l.offset++
-}
+// scanNumber
+func (l *Lexical) scanNumber() *Token {
+	start := l.offset
+	isFloat := false
 
-func (l *Lexical) forwardN(n int32) {
-	for i := int32(0); i < n; i++ {
-		l.forward()
-	}
-}
-
-// skipSpace
-func (l *Lexical) skipSpace() {
 	for l.offset < int32(len(l.content)) {
-		if IsSpaceChar(l.content[l.offset]) {
+		curChar := l.content[l.offset]
+		if IsDigitChar(curChar) {
+			l.forward()
+		} else if curChar == '.' && !isFloat {
+			isFloat = true
 			l.forward()
 		} else {
 			break
 		}
+	}
+
+	str := string(l.content[start:l.offset])
+	tokenType := Int
+	if isFloat {
+		tokenType = Float
+	}
+
+	return &Token{
+		Type:   tokenType,
+		Str:    str,
+		Offset: start,
 	}
 }
 
@@ -149,5 +153,32 @@ func (l *Lexical) scanSymbol() *Token {
 		Type:   tokenType,
 		Str:    symbol,
 		Offset: start,
+	}
+}
+
+// skipSpace
+func (l *Lexical) skipSpace() {
+	for l.offset < int32(len(l.content)) {
+		if IsSpaceChar(l.content[l.offset]) {
+			l.forward()
+		} else {
+			break
+		}
+	}
+}
+
+func (l *Lexical) forward() {
+	if l.content[l.offset] == '\n' {
+		l.line++
+		l.column = 0
+	} else {
+		l.column++
+	}
+	l.offset++
+}
+
+func (l *Lexical) forwardN(n int32) {
+	for i := int32(0); i < n; i++ {
+		l.forward()
 	}
 }

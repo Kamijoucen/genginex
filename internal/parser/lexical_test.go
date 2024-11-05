@@ -1,27 +1,52 @@
 package parser
 
 import (
-	"fmt"
 	"testing"
 )
 
-const rule_else_if_test = `
-'"lisicen"' '' test
-`
-
 // TestIfLexer
 func TestIfLexer(t *testing.T) {
-	lex := NewLexical(rule_else_if_test)
-
-	for {
-		token := lex.Next()
-		if token == nil {
-			break
-		}
-		fmt.Println(token)
-		t.Log(token)
+	rule_test := `
+	lisicen = 1
+	'"1"' '"2"' "" '' 1.5 5
+	`
+	lex := NewLexical(rule_test)
+	t1 := lex.Next()
+	if t1.Type != Identifier {
+		t.Error("t1.Type != Identifier")
 	}
-
+	t2 := lex.Next()
+	if t2.Type != Assign {
+		t.Error("t2.Type != Assign")
+	}
+	t3 := lex.Next()
+	if t3.Type != Int {
+		t.Error("t3.Type != Int")
+	}
+	t4 := lex.Next()
+	if t4.Type != String {
+		t.Error("t4.Type != String")
+	}
+	t5 := lex.Next()
+	if t5.Type != String {
+		t.Error("t5.Type != String")
+	}
+	t6 := lex.Next()
+	if t6.Type != String {
+		t.Error("t6.Type != String")
+	}
+	t7 := lex.Next()
+	if t7.Type != String {
+		t.Error("t7.Type != String")
+	}
+	t8 := lex.Next()
+	if t8.Type != Float {
+		t.Error("t7.Type != Float")
+	}
+	t9 := lex.Next()
+	if t9.Type != Int {
+		t.Error("t8.Type != Int")
+	}
 }
 
 // TestIsIdentifierFirstChar

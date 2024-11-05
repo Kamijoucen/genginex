@@ -1,61 +1,61 @@
 package parser
 
 var keywords = map[string]TokenType{
-	"if":    IF,
-	"else":  ELSE,
-	"begin": BEGIN,
-	"end":   END,
-	"rule":  RULE,
+	"if":    If,
+	"else":  Else,
+	"begin": Begin,
+	"end":   End,
+	"rule":  Rule,
 }
 
 var symbols = map[string]TokenType{
 	// 括号
-	"(": L_PAREN,
-	")": R_PAREN,
-	"{": L_BRACE,
-	"}": R_BRACE,
-	"[": L_BRACKET,
-	"]": R_BRACKET,
+	"(": LParen,
+	")": RParen,
+	"{": LBrace,
+	"}": RBrace,
+	"[": LBracket,
+	"]": RBracket,
 
 	// 算术运算符
-	"+":  ADD,
-	"-":  SUB,
-	"*":  MUL,
-	"/":  DIV,
-	"%":  MOD,
-	"++": DOUBLE_ADD,
-	"--": DOUBLE_SUB,
-	"**": DOUBLE_MUL,
+	"+":  Add,
+	"-":  Sub,
+	"*":  Mul,
+	"/":  Div,
+	"%":  Mod,
+	"++": DoubleAdd,
+	"--": DoubleSub,
+	"**": DoubleMul,
 
 	// 算术赋值运算符
-	"+=": ADD_ASSIGN,
-	"-=": SUB_ASSIGN,
-	"*=": MUL_ASSIGN,
-	"/=": DIV_ASSIGN,
-	"%=": MOD_ASSIGN,
+	"+=": AddAssign,
+	"-=": SubAssign,
+	"*=": MulAssign,
+	"/=": DivAssign,
+	"%=": ModAssign,
 
 	// 逻辑运算符
-	"!":  NOT,
-	"&&": AND,
-	"||": OR,
+	"!":  Not,
+	"&&": And,
+	"||": Or,
 
 	// 比较运算符
-	">":  GT,
-	">=": GE,
-	"<":  LT,
-	"<=": LE,
-	"==": EQ,
-	"!=": NE,
+	">":  Gt,
+	">=": Ge,
+	"<":  Lt,
+	"<=": Le,
+	"==": Eq,
+	"!=": Ne,
 
 	// 赋值运算符
-	"=": ASSIGN,
+	"=": Assign,
 
 	// 其他符号
-	",":   COMMA,
-	";":   SEMICOLON,
-	".":   DOT,
-	"?":   QUESTION,
-	":":   COLON,
-	"->":  ARROW,
-	"...": ELLIPSIS,
+	",":   Comma,
+	";":   Semicolon,
+	".":   Dot,
+	"?":   Question,
+	":":   Colon,
+	"->":  Arrow,
+	"...": Ellipsis,
 }
