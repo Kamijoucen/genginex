@@ -5,16 +5,14 @@ import (
 )
 
 type Lexical struct {
-	offset     int32
-	line       int32
-	column     int32
-	curStrFlag rune
-	content    []rune
+	offset  int32
+	line    int32
+	column  int32
+	content []rune
 }
 
 func NewLexical(content string) *Lexical {
 	lex := &Lexical{
-		offset:  0,
 		content: []rune(content),
 	}
 	return lex
@@ -33,7 +31,6 @@ func (l *Lexical) Next() *Token {
 			token = l.scanNumber()
 			match = true
 		} else if curChar == '"' || curChar == '\'' {
-			l.curStrFlag = curChar
 			token = l.scanString()
 			match = true
 		} else if IsSpaceChar(curChar) {
@@ -79,7 +76,7 @@ func (l *Lexical) scanNumber() *Token {
 // scanString
 func (l *Lexical) scanString() *Token {
 	start := l.offset
-	quote := l.curStrFlag
+	quote := l.content[l.offset]
 
 	l.forward()
 

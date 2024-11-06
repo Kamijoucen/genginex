@@ -2,11 +2,12 @@ package test
 
 import (
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/kamijoucen/genginex/builder"
 	"github.com/kamijoucen/genginex/context"
 	"github.com/kamijoucen/genginex/engine"
-	"testing"
-	"time"
 )
 
 const all_rules = `

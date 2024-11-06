@@ -2,11 +2,12 @@ package math
 
 import (
 	"fmt"
+	"testing"
+	"time"
+
 	"github.com/kamijoucen/genginex/builder"
 	"github.com/kamijoucen/genginex/context"
 	"github.com/kamijoucen/genginex/engine"
-	"testing"
-	"time"
 )
 
 type Entity struct {

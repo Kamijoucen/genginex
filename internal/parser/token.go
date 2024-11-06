@@ -44,7 +44,6 @@ const (
 	Question                     // ?
 	Colon                        // :
 	DoubleAdd                    // ++
-	DoubleSub                    // --
 	DoubleMul                    // **
 	DoubleQuote                  // "
 	SingleQuote                  // '
@@ -54,6 +53,91 @@ const (
 	End                          // end
 	Rule                         // rule
 )
+
+var keywords = map[string]TokenType{
+	"if":    If,
+	"else":  Else,
+	"begin": Begin,
+	"end":   End,
+	"rule":  Rule,
+}
+
+var symbols = map[string]TokenType{
+	// 括号
+	"(": LParen,
+	")": RParen,
+	"{": LBrace,
+	"}": RBrace,
+	"[": LBracket,
+	"]": RBracket,
+
+	// 算术运算符
+	"+":  Add,
+	"-":  Sub,
+	"*":  Mul,
+	"/":  Div,
+	"%":  Mod,
+	"++": DoubleAdd,
+	"**": DoubleMul,
+
+	// 算术赋值运算符
+	"+=": AddAssign,
+	"-=": SubAssign,
+	"*=": MulAssign,
+	"/=": DivAssign,
+	"%=": ModAssign,
+
+	// 逻辑运算符
+	"!":  Not,
+	"&&": And,
+	"||": Or,
+
+	// 比较运算符
+	">":  Gt,
+	">=": Ge,
+	"<":  Lt,
+	"<=": Le,
+	"==": Eq,
+	"!=": Ne,
+
+	// 赋值运算符
+	"=": Assign,
+
+	// 其他符号
+	",":   Comma,
+	";":   Semicolon,
+	".":   Dot,
+	"?":   Question,
+	":":   Colon,
+	"->":  Arrow,
+	"...": Ellipsis,
+}
+
+// 运算符优先级
+var operatorPrecedence = map[TokenType]int32{
+	Or:        10,
+	And:       20,
+	Eq:        30,
+	Ne:        30,
+	Gt:        30,
+	Ge:        30,
+	Lt:        30,
+	Le:        30,
+	Add:       40,
+	Sub:       40,
+	Mul:       50,
+	Div:       50,
+	Mod:       50,
+	Not:       60,
+	DoubleAdd: 70,
+	DoubleMul: 70,
+	Assign:    80,
+	AddAssign: 80,
+	SubAssign: 80,
+	MulAssign: 80,
+	DivAssign: 80,
+	ModAssign: 80,
+}
 
 type Token struct {
 	Type   TokenType

@@ -1,10 +1,11 @@
 package test
 
 import (
+	"testing"
+
 	"github.com/kamijoucen/genginex/builder"
 	"github.com/kamijoucen/genginex/context"
 	"github.com/kamijoucen/genginex/engine"
-	"testing"
 )
 
 const multi_input_rule = `

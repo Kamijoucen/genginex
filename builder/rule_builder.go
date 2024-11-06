@@ -38,9 +38,10 @@ func (builder *RuleBuilder) BuildRuleFromString(ruleString string) error {
 
 	if strings.TrimSpace(ruleString) == "" {
 		//nil ruleString check
-		return errors.New(fmt.Sprintf("inject ruleString is %s", ruleString))
+		return fmt.Errorf("inject ruleString is %s", ruleString)
 	}
 
+	// AST存储
 	kc := base.NewKnowledgeContext()
 
 	in := antlr.NewInputStream(ruleString)
@@ -60,7 +61,7 @@ func (builder *RuleBuilder) BuildRuleFromString(ruleString string) error {
 	antlr.ParseTreeWalkerDefault.Walk(listener, psr.Primary())
 
 	if len(lexerErrListener.GrammarErrors) > 0 {
-		return errors.New(fmt.Sprintf("%+v", lexerErrListener.GrammarErrors))
+		return fmt.Errorf("%+v", lexerErrListener.GrammarErrors)
 	}
 
 	if len(grammarErrListener.GrammarErrors) > 0 {
