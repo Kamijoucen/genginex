@@ -21,6 +21,12 @@ func NewParser(tks []*Token) *Parser {
 // ParseStatements
 func (p *Parser) ParseStatements() (*base.Statements, error) {
 
+	return nil, nil
+}
+
+// ParseExpression
+func (p *Parser) ParseExpression() (*base.BinaryExpression, error) {
+
 	
 
 	return nil, nil
@@ -53,7 +59,10 @@ func (p *Parser) ParseRuleEntity() (*base.RuleEntity, error) {
 		return nil, err
 	}
 
-	// TODO parse rule content
+	sts, err := p.ParseStatements()
+	if err != nil {
+		return nil, err
+	}
 
 	if _, err := p.checkTokenAndForward(End); err != nil {
 		return nil, err
@@ -62,7 +71,9 @@ func (p *Parser) ParseRuleEntity() (*base.RuleEntity, error) {
 		RuleName:        nameToken.Str,
 		Salience:        salience,
 		RuleDescription: ruleDesc,
-		RuleContent:     nil,
+		RuleContent: &base.RuleContent{
+			Statements: sts,
+		},
 	}
 	return t, nil
 }
