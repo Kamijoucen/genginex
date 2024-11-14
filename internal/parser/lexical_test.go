@@ -2,6 +2,8 @@ package parser
 
 import (
 	"testing"
+
+	"github.com/kamijoucen/genginex/internal/base"
 )
 
 // TestIfLexer
@@ -12,39 +14,39 @@ func TestIfLexer(t *testing.T) {
 	`
 	lex := NewLexical(rule_test)
 	t1 := lex.Next()
-	if t1.Type != Identifier {
+	if t1.Type != base.Identifier {
 		t.Error("t1.Type != Identifier")
 	}
 	t2 := lex.Next()
-	if t2.Type != Assign {
+	if t2.Type != base.Assign {
 		t.Error("t2.Type != Assign")
 	}
 	t3 := lex.Next()
-	if t3.Type != Int {
+	if t3.Type != base.Int {
 		t.Error("t3.Type != Int")
 	}
 	t4 := lex.Next()
-	if t4.Type != String {
+	if t4.Type != base.String {
 		t.Error("t4.Type != String")
 	}
 	t5 := lex.Next()
-	if t5.Type != String {
+	if t5.Type != base.String {
 		t.Error("t5.Type != String")
 	}
 	t6 := lex.Next()
-	if t6.Type != String {
+	if t6.Type != base.String {
 		t.Error("t6.Type != String")
 	}
 	t7 := lex.Next()
-	if t7.Type != String {
+	if t7.Type != base.String {
 		t.Error("t7.Type != String")
 	}
 	t8 := lex.Next()
-	if t8.Type != Float {
+	if t8.Type != base.Float {
 		t.Error("t7.Type != Float")
 	}
 	t9 := lex.Next()
-	if t9.Type != Int {
+	if t9.Type != base.Int {
 		t.Error("t8.Type != Int")
 	}
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/kamijoucen/genginex/context"
 )
 
-type ExpressionEval interface {
+type ExpressionNode interface {
 	Evaluate(dc *context.DataContext, Vars map[string]reflect.Value) (reflect.Value, error)
 }
 

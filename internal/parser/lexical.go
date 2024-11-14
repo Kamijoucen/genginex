@@ -2,6 +2,8 @@ package parser
 
 import (
 	"fmt"
+
+	"github.com/kamijoucen/genginex/internal/base"
 )
 
 type Lexical struct {
@@ -19,8 +21,8 @@ func NewLexical(content string) *Lexical {
 }
 
 // Next
-func (l *Lexical) Next() *Token {
-	var token *Token
+func (l *Lexical) Next() *base.Token {
+	var token *base.Token
 	match := false
 	for !match && l.offset < int32(len(l.content)) {
 		curChar := l.content[l.offset]
@@ -44,7 +46,7 @@ func (l *Lexical) Next() *Token {
 }
 
 // scanNumber
-func (l *Lexical) scanNumber() *Token {
+func (l *Lexical) scanNumber() *base.Token {
 	start := l.offset
 	isFloat := false
 
@@ -59,14 +61,12 @@ func (l *Lexical) scanNumber() *Token {
 			break
 		}
 	}
-
 	str := string(l.content[start:l.offset])
-	tokenType := Int
+	tokenType := base.Int
 	if isFloat {
-		tokenType = Float
+		tokenType = base.Float
 	}
-
-	return &Token{
+	return &base.Token{
 		Type:   tokenType,
 		Str:    str,
 		Offset: start,
@@ -74,7 +74,7 @@ func (l *Lexical) scanNumber() *Token {
 }
 
 // scanString
-func (l *Lexical) scanString() *Token {
+func (l *Lexical) scanString() *base.Token {
 	start := l.offset
 	quote := l.content[l.offset]
 
@@ -82,11 +82,9 @@ func (l *Lexical) scanString() *Token {
 
 	for l.offset < int32(len(l.content)) {
 		c := l.content[l.offset]
+		l.forward()
 		if c == quote {
-			l.forward()
 			break
-		} else {
-			l.forward()
 		}
 	}
 
@@ -94,14 +92,14 @@ func (l *Lexical) scanString() *Token {
 		panic(fmt.Sprintf("未结束的字符串在 %d:%d", l.line, l.column))
 	}
 	str := string(l.content[start:l.offset])
-	return &Token{
-		Type:   String,
+	return &base.Token{
+		Type:   base.String,
 		Str:    str,
 		Offset: start,
 	}
 }
 
-func (l *Lexical) scanIdentifier() *Token {
+func (l *Lexical) scanIdentifier() *base.Token {
 	start := l.offset
 	l.forward()
 	for l.offset < int32(len(l.content)) {
@@ -111,11 +109,11 @@ func (l *Lexical) scanIdentifier() *Token {
 		l.forward()
 	}
 	str := string(l.content[start:l.offset])
-	stype := Identifier
-	if t, ok := keywords[str]; ok {
+	stype := base.Identifier
+	if t := base.GetKeywordType(str); t != base.UnKnow {
 		stype = t
 	}
-	return &Token{
+	return &base.Token{
 		Type:   stype,
 		Str:    str,
 		Offset: start,
@@ -123,10 +121,10 @@ func (l *Lexical) scanIdentifier() *Token {
 }
 
 // scanSymbol
-func (l *Lexical) scanSymbol() *Token {
+func (l *Lexical) scanSymbol() *base.Token {
 	start := l.offset
 	var symbol string
-	var tokenType TokenType
+	var tokenType base.TokenType
 	found := false
 
 	maxLen := 3
@@ -135,9 +133,9 @@ func (l *Lexical) scanSymbol() *Token {
 			continue
 		}
 		temp := string(l.content[l.offset : l.offset+int32(length)])
-		if tType, ok := symbols[temp]; ok {
+		if t := base.GetSymbolType(temp); t != base.UnKnow {
 			symbol = temp
-			tokenType = tType
+			tokenType = t
 			found = true
 			l.forwardN(int32(length))
 			break
@@ -146,7 +144,7 @@ func (l *Lexical) scanSymbol() *Token {
 	if !found {
 		panic(fmt.Sprintf("unexpected symbol '%s' at %d:%d", string(l.content[l.offset]), l.line, l.column))
 	}
-	return &Token{
+	return &base.Token{
 		Type:   tokenType,
 		Str:    symbol,
 		Offset: start,
