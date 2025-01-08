@@ -6,6 +6,10 @@ import (
 	"github.com/kamijoucen/genginex/internal/base"
 )
 
+var EofToken = &base.Token{
+	Type: base.Eof,
+}
+
 type Lexical struct {
 	offset  int32
 	line    int32
@@ -21,32 +25,34 @@ func NewLexical(content string) *Lexical {
 }
 
 // Next
-func (l *Lexical) Next() *base.Token {
-	var token *base.Token
+func (l *Lexical) Next() (tk *base.Token, err error) {
+	if l.offset >= int32(len(l.content)) {
+		return EofToken, nil
+	}
 	match := false
 	for !match && l.offset < int32(len(l.content)) {
 		curChar := l.content[l.offset]
 		if IsIdentifierFirstChar(curChar) {
-			token = l.scanIdentifier()
+			tk, err = l.scanIdentifier()
 			match = true
 		} else if IsDigitChar(curChar) {
-			token = l.scanNumber()
+			tk, err = l.scanNumber()
 			match = true
 		} else if curChar == '"' || curChar == '\'' {
-			token = l.scanString()
+			tk, err = l.scanString()
 			match = true
 		} else if IsSpaceChar(curChar) {
 			l.skipSpace()
 		} else {
-			token = l.scanSymbol()
+			tk, err = l.scanSymbol()
 			match = true
 		}
 	}
-	return token
+	return
 }
 
 // scanNumber
-func (l *Lexical) scanNumber() *base.Token {
+func (l *Lexical) scanNumber() (*base.Token, error) {
 	start := l.offset
 	isFloat := false
 
@@ -70,11 +76,11 @@ func (l *Lexical) scanNumber() *base.Token {
 		Type:   tokenType,
 		Str:    str,
 		Offset: start,
-	}
+	}, nil
 }
 
 // scanString
-func (l *Lexical) scanString() *base.Token {
+func (l *Lexical) scanString() (*base.Token, error) {
 	start := l.offset
 	quote := l.content[l.offset]
 
@@ -89,17 +95,17 @@ func (l *Lexical) scanString() *base.Token {
 	}
 
 	if l.offset > int32(len(l.content)) {
-		panic(fmt.Sprintf("未结束的字符串在 %d:%d", l.line, l.column))
+		return nil, fmt.Errorf("未结束的字符串在 %d:%d", l.line, l.column)
 	}
 	str := string(l.content[start:l.offset])
 	return &base.Token{
 		Type:   base.String,
 		Str:    str,
 		Offset: start,
-	}
+	}, nil
 }
 
-func (l *Lexical) scanIdentifier() *base.Token {
+func (l *Lexical) scanIdentifier() (*base.Token, error) {
 	start := l.offset
 	l.forward()
 	for l.offset < int32(len(l.content)) {
@@ -117,11 +123,11 @@ func (l *Lexical) scanIdentifier() *base.Token {
 		Type:   stype,
 		Str:    str,
 		Offset: start,
-	}
+	}, nil
 }
 
 // scanSymbol
-func (l *Lexical) scanSymbol() *base.Token {
+func (l *Lexical) scanSymbol() (*base.Token, error) {
 	start := l.offset
 	var symbol string
 	var tokenType base.TokenType
@@ -142,13 +148,13 @@ func (l *Lexical) scanSymbol() *base.Token {
 		}
 	}
 	if !found {
-		panic(fmt.Sprintf("unexpected symbol '%s' at %d:%d", string(l.content[l.offset]), l.line, l.column))
+		return nil, fmt.Errorf("unexpected symbol '%s' at %d:%d", string(l.content[l.offset]), l.line, l.column)
 	}
 	return &base.Token{
 		Type:   tokenType,
 		Str:    symbol,
 		Offset: start,
-	}
+	}, nil
 }
 
 // skipSpace

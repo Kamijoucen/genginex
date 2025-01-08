@@ -3,7 +3,8 @@ package base
 type TokenType uint8
 
 const (
-	UnKnow      TokenType = iota // 文件结束
+	UnKnow      TokenType = iota // 未知
+	Eof                          // 文件结束
 	Identifier                   // 标识符
 	Float                        // 浮点数
 	Int                          // 整数

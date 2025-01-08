@@ -3,6 +3,8 @@ package engine
 import (
 	"errors"
 	"fmt"
+	"sync"
+
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/kamijoucen/genginex/builder"
 	"github.com/kamijoucen/genginex/context"
@@ -10,7 +12,6 @@ import (
 	parser "github.com/kamijoucen/genginex/internal/iantlr/alr"
 	"github.com/kamijoucen/genginex/internal/iparser"
 	"github.com/kamijoucen/genginex/internal/tool"
-	"sync"
 
 	"github.com/google/martian/log"
 )

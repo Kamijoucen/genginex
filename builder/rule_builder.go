@@ -8,10 +8,12 @@ import (
 	"sync"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
+
 	"github.com/kamijoucen/genginex/context"
 	"github.com/kamijoucen/genginex/internal/base"
-	parser "github.com/kamijoucen/genginex/internal/iantlr/alr"
+	parser2 "github.com/kamijoucen/genginex/internal/iantlr/alr"
 	"github.com/kamijoucen/genginex/internal/iparser"
+	"github.com/kamijoucen/genginex/internal/parser"
 	"github.com/kamijoucen/genginex/internal/tool"
 )
 
@@ -37,15 +39,34 @@ func (builder *RuleBuilder) BuildRuleFromString(ruleString string) error {
 	defer builder.buildLock.Unlock()
 
 	if strings.TrimSpace(ruleString) == "" {
-		//nil ruleString check
+		// nil ruleString check
 		return fmt.Errorf("inject ruleString is %s", ruleString)
 	}
 
 	// AST存储
 	kc := base.NewKnowledgeContext()
 
+	lx := parser.NewLexical(ruleString)
+	tks := make([]*base.Token, 0)
+
+	for {
+		tk, err := lx.Next()
+		if err != nil {
+			return err
+		}
+		if tk.Type == base.Eof {
+			break
+		}
+		tks = append(tks, tk)
+	}
+
+	p := parser.NewParser(tks)
+
+	stmts, err := p.ParseStatements()
+
+
 	in := antlr.NewInputStream(ruleString)
-	lexer := parser.NewgengineLexer(in)
+	lexer := parser2.NewgengineLexer(in)
 	lexerErrListener := iparser.NewGengineErrorListener()
 	lexer.AddErrorListener(lexerErrListener)
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
@@ -53,9 +74,9 @@ func (builder *RuleBuilder) BuildRuleFromString(ruleString string) error {
 	// TODO listener内添加ast
 	listener := iparser.NewGengineParserListener(kc)
 
-	psr := parser.NewgengineParser(stream)
+	psr := parser2.NewgengineParser(stream)
 	psr.BuildParseTrees = true
-	//grammar listener
+	// grammar listener
 	grammarErrListener := iparser.NewGengineErrorListener()
 	psr.AddErrorListener(grammarErrListener)
 	antlr.ParseTreeWalkerDefault.Walk(listener, psr.Primary())
@@ -72,7 +93,7 @@ func (builder *RuleBuilder) BuildRuleFromString(ruleString string) error {
 		return errors.New(fmt.Sprintf("%+v", listener.ParseErrors))
 	}
 
-	//sort
+	// sort
 	for _, v := range kc.RuleEntities {
 		kc.SortRules = append(kc.SortRules, v)
 	}
@@ -95,17 +116,17 @@ func (builder *RuleBuilder) BuildRuleFromString(ruleString string) error {
 // if a rule doesn't exist, this method will add the new rule to the existed rules list
 // in detail: copy from old -> update the copy -> use the updated copy to replace old
 func (builder *RuleBuilder) BuildRuleWithIncremental(ruleString string) error {
-	//make sure incremental update is thread safety!
+	// make sure incremental update is thread safety!
 	builder.buildLock.Lock()
 	defer builder.buildLock.Unlock()
 
 	if strings.TrimSpace(ruleString) == "" {
-		//nil ruleString check
+		// nil ruleString check
 		return errors.New(fmt.Sprintf("incremental inject ruleString is %s", ruleString))
 	}
 
 	in := antlr.NewInputStream(ruleString)
-	lexer := parser.NewgengineLexer(in)
+	lexer := parser2.NewgengineLexer(in)
 	lexerErrListener := iparser.NewGengineErrorListener()
 	lexer.AddErrorListener(lexerErrListener)
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
@@ -113,7 +134,7 @@ func (builder *RuleBuilder) BuildRuleWithIncremental(ruleString string) error {
 	kc := base.NewKnowledgeContext()
 	listener := iparser.NewGengineParserListener(kc)
 
-	psr := parser.NewgengineParser(stream)
+	psr := parser2.NewgengineParser(stream)
 	psr.BuildParseTrees = true
 
 	grammarErrListener := iparser.NewGengineErrorListener()
@@ -136,31 +157,31 @@ func (builder *RuleBuilder) BuildRuleWithIncremental(ruleString string) error {
 		return errors.New(fmt.Sprintf("no rules need to update or add."))
 	}
 
-	//copy
+	// copy
 	newRuleEntities := make(map[string]*base.RuleEntity, len(builder.Kc.RuleEntities))
 	for mk, mv := range builder.Kc.RuleEntities {
 		newRuleEntities[mk] = mv
 	}
 
-	//copy
+	// copy
 	newSortRules := make([]*base.RuleEntity, len(builder.Kc.SortRules))
 	for sk, sv := range builder.Kc.SortRules {
 		newSortRules[sk] = sv
 	}
 
-	//kc store the new rules
+	// kc store the new rules
 	for k, v := range kc.RuleEntities {
 
 		if vm, ok := newRuleEntities[k]; ok {
-			//repalce update
-			//search
+			// repalce update
+			// search
 			index := builder.Kc.SortRulesIndexMap[v.RuleName]
 			if v.Salience == vm.Salience {
-				//replace
+				// replace
 				newSortRules[index] = v
 			} else {
 				newSortRules := append(newSortRules[:index], newSortRules[index+1:]...)
-				//search location to insert
+				// search location to insert
 				low, mid := tool.BinarySearch(newSortRules, v.Salience)
 
 				ire := []*base.RuleEntity{v}
@@ -172,7 +193,7 @@ func (builder *RuleBuilder) BuildRuleWithIncremental(ruleString string) error {
 					newSortRules = append(newSortRules[:mid], newRe...)
 				}
 
-				//update the sort index
+				// update the sort index
 				indexMap := make(map[string]int)
 				for k, v := range newSortRules {
 					indexMap[v.RuleName] = k
@@ -182,7 +203,7 @@ func (builder *RuleBuilder) BuildRuleWithIncremental(ruleString string) error {
 
 			newRuleEntities[k] = v
 		} else {
-			//add update
+			// add update
 			low, mid := tool.BinarySearch(newSortRules, v.Salience)
 
 			ire := []*base.RuleEntity{v}
@@ -194,7 +215,7 @@ func (builder *RuleBuilder) BuildRuleWithIncremental(ruleString string) error {
 				newSortRules = append(newSortRules[:mid], newRe...)
 			}
 
-			//update the sort index
+			// update the sort index
 			indexMap := make(map[string]int)
 			for k, v := range newSortRules {
 				indexMap[v.RuleName] = k
